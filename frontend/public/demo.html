@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Planner - Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --primary-hover: #0b5ed7;
+            --hero-bg-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2144&q=80');
+        }
+        
+        [data-bs-theme="dark"] {
+            --bs-body-bg: #000000;
+            --bs-body-color: #e0e0e0;
+            --bs-card-bg: #121212;
+            --bs-card-border-color: #333;
+            --bs-modal-bg: #121212;
+            --bs-border-color: #333;
+        }
+
+        [data-bs-theme="dark"] .bg-light {
+            background-color: #121212 !important;
+        }
+
+        [data-bs-theme="dark"] footer {
+            background-color: #000000 !important;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: #000;
+        }
+
+        [data-bs-theme="dark"] h1,
+        [data-bs-theme="dark"] h2,
+        [data-bs-theme="dark"] h3,
+        [data-bs-theme="dark"] h4,
+        [data-bs-theme="dark"] h5,
+        [data-bs-theme="dark"] h6 {
+            color: #fff !important;
+        }
+
+        .hero-section {
+            height: 70vh;
+            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.7)), var(--hero-bg-image);
+            background-size: cover;
+            background-position: center;
+            color: white;
+            display: flex;
+            align-items: center;
+            text-align: center;
+        }
+        .feature-card {
+            height: 100%;
+            transition: transform 0.3s ease-in-out;
+            margin-bottom: 20px;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .destination-card {
+            height: 100%;
+            margin-bottom: 45px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .destination-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        footer {
+            background-color: var(--bs-body-bg);
+            padding: 20px 0;
+            margin-top: 40px;
+            border-top: 1px solid var(--bs-border-color);
+        }
+        .trip-form {
+            background: var(--bs-body-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .modal-content {
+            border-radius: 15px;
+            background-color: var(--bs-modal-bg);
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .loading-spinner {
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        .theme-icon {
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        
+        [data-bs-theme="dark"] .navbar-brand,
+        [data-bs-theme="dark"] .nav-link {
+            color: #fff;
+        }
+        
+        [data-bs-theme="dark"] .navbar-toggler-icon {
+            filter: invert(1);
+        }
+        
+        [data-bs-theme="dark"] .feature-card:hover,
+        [data-bs-theme="dark"] .destination-card:hover {
+            box-shadow: 0 10px 20px rgba(255,255,255,0.1);
+        }
+        
+        /* Make images in cards consistent size */
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .destination-row {
+            margin-bottom: 30px;
+        }
+        
+        /* Additional spacing for section titles */
+        .section-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 2.5rem;
+            text-align: center;
+            width: 100%;
+        }
+        
+        /* Increased spacing in card body */
+        .card-body {
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .card-text {
+            text-align: center;
+        }
+        
+        p {
+            text-align: center;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideInLeft {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        
+        .animate-slide-left {
+            animation: slideInLeft 0.8s ease-out forwards;
+        }
+        
+        .animate-slide-right {
+            animation: slideInRight 0.8s ease-out forwards;
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s infinite ease-in-out;
+        }
+        
+        .animate-float {
+            animation: float 6s infinite ease-in-out;
+        }
+        
+        .destination-card, .feature-card, #testimonials-row .card {
+            transition: transform 0.5s ease, box-shadow 0.5s ease, background-color 0.3s ease;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+            margin-bottom: 30px;
+        }
+        
+        .destination-card:hover, .feature-card:hover, #testimonials-row .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(13, 110, 253, 0.3);
+            z-index: 1;
+        }
+        
+        [data-bs-theme="dark"] .destination-card, 
+        [data-bs-theme="dark"] .feature-card,
+        [data-bs-theme="dark"] #testimonials-row .card {
+            box-shadow: 0 4px 12px rgba(66, 135, 245, 0.2);
+        }
+        
+        [data-bs-theme="dark"] .destination-card:hover, 
+        [data-bs-theme="dark"] .feature-card:hover,
+        [data-bs-theme="dark"] #testimonials-row .card:hover {
+            box-shadow: 0 15px 30px rgba(66, 135, 245, 0.3);
+        }
+        
+        .card-img-top {
+            transition: transform 0.5s ease;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-image: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            transform: scale(1);
+            transition: .5s ease;
+        }
+        
+        .destination-card:hover .card-overlay {
+            opacity: 1;
+        }
+        
+        [data-bs-theme="dark"] .destination-card:hover, 
+        [data-bs-theme="dark"] .feature-card:hover {
+            box-shadow: 0 15px 30px rgba(255,255,255,0.1);
+        }
+        
+        .highlight-destination {
+            position: relative;
+        }
+        
+        .highlight-destination::after {
+            content: 'Popular';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transform: rotate(5deg);
+        }
+        
+        .trending-destination {
+            position: relative;
+        }
+        
+        .trending-destination::after {
+            content: 'Trending';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transform: rotate(5deg);
+        }
+        
+        .seasonal-destination {
+            position: relative;
+        }
+        
+        .seasonal-destination::after {
+            content: 'Seasonal';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #1abc9c;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transform: rotate(5deg);
+        }
+        
+        .budget-destination {
+            position: relative;
+        }
+        
+        .budget-destination::after {
+            content: 'Budget-Friendly';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #27ae60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transform: rotate(5deg);
+        }
+        
+        .btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: -1;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.5s ease;
+        }
+        
+        .btn:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.3);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+        
+        .btn:hover::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(20, 20);
+                opacity: 0;
+            }
+        }
+        
+        .hero-section {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%);
+            z-index: 1;
+        }
+        
+        .hero-section .container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-section h1 {
+            animation: fadeIn 1s ease-out forwards;
+            animation-delay: 0.3s;
+            opacity: 0;
+        }
+        
+        .hero-section p {
+            animation: fadeIn 1s ease-out forwards;
+            animation-delay: 0.6s;
+            opacity: 0;
+        }
+        
+        .hero-section .btn:first-child {
+            animation: fadeIn 1s ease-out forwards;
+            animation-delay: 0.9s;
+            opacity: 0;
+        }
+        
+        .hero-section .btn:last-child {
+            animation: fadeIn 1s ease-out forwards;
+            animation-delay: 1.2s;
+            opacity: 0;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            width: 50%;
+            height: 2px;
+            background-color: var(--primary-color);
+            bottom: -10px;
+            left: 25%;
+            transform: scaleX(0);
+            transition: transform 0.5s ease;
+        }
+        
+        .section-visible .section-title::after {
+            transform: scaleX(1);
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        .hero-section {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%);
+            z-index: 1;
+        }
+        
+        .hero-section .container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Additional animations */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(13, 110, 253, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(13, 110, 253, 0.5); }
+        }
+        
+        @keyframes colorShift {
+            0% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(15deg); }
+            100% { filter: hue-rotate(0deg); }
+        }
+        
+        .animate-bounce {
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        .animate-glow {
+            animation: glow 3s ease-in-out infinite;
+        }
+        
+        .animate-color-shift {
+            animation: colorShift 5s linear infinite;
+        }
+
+        .popular-destination {
+            position: relative;
+        }
+        
+        .popular-destination::after {
+            content: 'Popular';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #0d6efd;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transform: rotate(5deg);
+        }
+        
+        .destination-card:hover img, .feature-card:hover img, #testimonials-row .card:hover img {
+            transform: scale(1.1);
+            transition: transform 0.5s ease, filter 0.5s ease;
+            filter: saturate(1.2) contrast(1.1);
+        }
+
+        .bg-switcher {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .bg-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.3s;
+        }
+        
+        .bg-option:hover {
+            transform: scale(1.2);
+        }
+        
+        .bg-option.active {
+            border: 2px solid #0d6efd;
+            transform: scale(1.2);
+        }
+        
+        .btn-close {
+            z-index: 1050;
+            opacity: 1;
+            transition: opacity 0.2s ease-in-out;
+        }
+        
+        [data-bs-theme="dark"] .btn-close {
+            filter: invert(1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">Trip Planner</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#planTripModal">Plan Trip</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <div class="theme-toggle me-3">
+                        <i class="bi bi-sun-fill theme-icon" id="lightThemeIcon"></i>
+                        <i class="bi bi-moon-fill theme-icon d-none" id="darkThemeIcon"></i>
+                    </div>
+                    <button class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+                    <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#registerModal">Register</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container animate-fade-in">
+            <h1 class="display-4">Plan Your Perfect Trip</h1>
+            <p class="lead">Discover personalized travel recommendations and itineraries powered by AI</p>
+            <div class="mt-4">
+                <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#planTripModal">Start Planning</button>
+                <button class="btn btn-outline-light btn-lg ms-2" onclick="scrollToDestinations()">Explore Destinations</button>
+            </div>
+        </div>
+        <div class="bg-switcher">
+            <div class="bg-option active" style="background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2144&q=80');" data-bg="url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2144&q=80')"></div>
+            <div class="bg-option" style="background-image: url('https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80');" data-bg="url('https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80')"></div>
+            <div class="bg-option" style="background-image: url('https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80');" data-bg="url('https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80')"></div>
+            <div class="bg-option" style="background-image: url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80');" data-bg="url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80')"></div>
+            <div class="bg-option" style="background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80');" data-bg="url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80')"></div>
+        </div>
+    </section>
+
+    <!-- Trip Planning Modal -->
+    <div class="modal fade" id="planTripModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Plan Your Trip</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="tripForm">
+                        <div class="mb-3">
+                            <label class="form-label">Destination</label>
+                            <input type="text" class="form-control" id="destination" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="startDate" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="endDate" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Budget (USD)</label>
+                            <input type="number" class="form-control" id="budget" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Interests (Select multiple)</label>
+                            <select class="form-select" id="interests" multiple>
+                                <option value="adventure">Adventure</option>
+                                <option value="culture">Culture</option>
+                                <option value="food">Food</option>
+                                <option value="nature">Nature</option>
+                                <option value="relaxation">Relaxation</option>
+                            </select>
+                        </div>
+                        <div class="loading">
+                            <div class="spinner-border loading-spinner text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Generating your personalized trip plan...</p>
+                        </div>
+                        <div id="tripResults" class="d-none">
+                            <h5>Your Trip Plan</h5>
+                            <div id="itinerary" class="mb-3"></div>
+                            <div id="recommendations" class="mb-3"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="generateTripPlan()">Generate Plan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="loginEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" required>
+                        </div>
+                        <div class="d-none text-danger mb-3" id="loginError"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="loginForm" class="btn btn-primary">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal fade" id="registerModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Register</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="registerForm">
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control" id="registerName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="registerEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" id="registerPassword" required>
+                        </div>
+                        <div class="d-none text-danger mb-3" id="registerError"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="registerForm" class="btn btn-primary">Register</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-4 section-title">How It Works</h2>
+            <p class="text-center text-muted mb-5">Our AI-powered platform helps you create the perfect trip with just a few clicks</p>
+            
+            <div class="row g-4" id="features-row">
+                <!-- Feature 1 -->
+                <div class="col-md-4">
+                    <div class="card feature-card">
+                        <img src="https://images.unsplash.com/photo-1667489022797-ab608913feeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2073&q=80" class="card-img-top" alt="Personalized Recommendations">
+                        <div class="card-body">
+                            <h5 class="card-title">Personalized Recommendations</h5>
+                            <p class="card-text">Get destination recommendations tailored to your preferences and travel history.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="col-md-4">
+                    <div class="card feature-card">
+                        <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2022&q=80" class="card-img-top" alt="Smart Budget Planning">
+                        <div class="card-body">
+                            <h5 class="card-title">Smart Budget Planning</h5>
+                            <p class="card-text">Plan your trip with accurate price predictions and budget optimization.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="col-md-4">
+                    <div class="card feature-card">
+                        <img src="https://images.unsplash.com/photo-1488229297570-58520851e868?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80" class="card-img-top" alt="AI-Powered Itineraries">
+                        <div class="card-body">
+                            <h5 class="card-title">AI-Powered Itineraries</h5>
+                            <p class="card-text">Generate optimized itineraries based on your interests and time constraints.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Destinations Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-4 section-title">Popular Destinations</h2>
+            <p class="text-center text-muted mb-5">Explore some of our users' favorite places</p>
+            
+            <div class="row g-4 destination-row" id="destinations-row">
+                <!-- Destination 1 -->
+                <div class="col-md-4">
+                    <div class="card destination-card popular-destination">
+                        <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2073&q=80" class="card-img-top" alt="Paris">
+                        <div class="card-body">
+                            <h5 class="card-title">Paris</h5>
+                            <p class="card-text">Discover the romance and beauty of the City of Lights.</p>
+                            <a href="#" class="btn btn-sm btn-primary">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Destination 2 -->
+                <div class="col-md-4">
+                    <div class="card destination-card trending-destination">
+                        <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80" class="card-img-top" alt="Bali">
+                        <div class="card-body">
+                            <h5 class="card-title">Bali</h5>
+                            <p class="card-text">Experience tropical paradise with stunning beaches and rich culture.</p>
+                            <a href="#" class="btn btn-sm btn-primary">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Destination 3 -->
+                <div class="col-md-4">
+                    <div class="card destination-card popular-destination">
+                        <img src="https://images.unsplash.com/photo-1492571350019-22de08371fd3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2053&q=80" class="card-img-top" alt="Tokyo">
+                        <div class="card-body">
+                            <h5 class="card-title">Tokyo</h5>
+                            <p class="card-text">Explore the perfect blend of tradition and cutting-edge technology.</p>
+                            <a href="#" class="btn btn-sm btn-primary">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Destination 4 -->
+                <div class="col-md-4">
+                    <div class="card destination-card budget-destination">
+                        <img src="https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" class="card-img-top" alt="New York">
+                        <div class="card-body">
+                            <h5 class="card-title">New York</h5>
+                            <p class="card-text">Experience the vibrant energy of the city that never sleeps.</p>
+                            <a href="#" class="btn btn-sm btn-primary">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Destination 5 -->
+                <div class="col-md-4">
+                    <div class="card destination-card trending-destination">
+                        <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" class="card-img-top" alt="Dubai">
+                        <div class="card-body">
+                            <h5 class="card-title">Dubai</h5>
+                            <p class="card-text">Discover the futuristic city of luxury and innovation.</p>
+                            <a href="#" class="btn btn-sm btn-primary">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Destination 6 -->
+                <div class="col-md-4">
+                    <div class="card destination-card popular-destination">
+                        <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1996&q=80" class="card-img-top" alt="Rome">
+                        <div class="card-body">
+                            <h5 class="card-title">Rome</h5>
+                            <p class="card-text">Explore the ancient ruins and Renaissance masterpieces.</p>
+                            <a href="#" class="btn btn-sm btn-primary">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Destination 7 -->
+                <div class="col-md-4">
+                    <div class="card destination-card budget-destination">
+                        <img src="https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" class="card-img-top" alt="Sydney">
+                        <div class="card-body">
+                            <h5 class="card-title">Sydney</h5>
+                            <p class="card-text">Experience the beautiful harbor and iconic Opera House.</p>
+                            <a href="#" class="btn btn-sm btn-primary">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Destination 8 -->
+                <div class="col-md-4">
+                    <div class="card destination-card seasonal-destination">
+                        <img src="https://images.unsplash.com/photo-1528702748617-c64d49f918af?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" class="card-img-top" alt="Santorini">
+                        <div class="card-body">
+                            <h5 class="card-title">Santorini</h5>
+                            <p class="card-text">Enjoy breathtaking views from iconic white and blue buildings.</p>
+                            <a href="#" class="btn btn-sm btn-primary">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Destination 9 -->
+                <div class="col-md-4">
+                    <div class="card destination-card budget-destination">
+                        <img src="https://images.unsplash.com/photo-1565967511849-76a60a516170?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80" class="card-img-top" alt="Kyoto">
+                        <div class="card-body">
+                            <h5 class="card-title">Kyoto</h5>
+                            <p class="card-text">Discover ancient temples and beautiful Japanese gardens.</p>
+                            <a href="#" class="btn btn-sm btn-primary">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Destination 10 -->
+                <div class="col-md-4">
+                    <div class="card destination-card budget-destination">
+                        <img src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80" class="card-img-top" alt="Tuscany">
+                        <div class="card-body">
+                            <h5 class="card-title">Tuscany</h5>
+                            <p class="card-text">Experience rolling hills, vineyards, and Italian countryside charm.</p>
+                            <a href="#" class="btn btn-sm btn-primary">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Destination 11 -->
+                <div class="col-md-4">
+                    <div class="card destination-card popular-destination">
+                        <img src="https://images.unsplash.com/photo-1539037116277-4db20889f2d4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=85" class="card-img-top" alt="Barcelona">
+                        <div class="card-body">
+                            <h5 class="card-title">Barcelona</h5>
+                            <p class="card-text">Visit Gaudí's masterpieces and enjoy the vibrant Catalan culture.</p>
+                            <a href="#" class="btn btn-sm btn-primary">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Destination 12 -->
+                <div class="col-md-4">
+                    <div class="card destination-card trending-destination">
+                        <img src="https://images.unsplash.com/photo-1573843981267-be1999ff37cd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=85" class="card-img-top" alt="Maldives">
+                        <div class="card-body">
+                            <h5 class="card-title">Maldives</h5>
+                            <p class="card-text">Relax in overwater bungalows on pristine turquoise waters.</p>
+                            <a href="#" class="btn btn-sm btn-primary">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-5 text-center">
+        <div class="container">
+            <h2 class="mb-3">Ready to Plan Your Next Adventure?</h2>
+            <p class="text-muted mb-4">Create your personalized trip plan in minutes</p>
+            <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#planTripModal">Get Started</button>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">What Our Travelers Say</h2>
+            <div class="row g-4" id="testimonials-row">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <img src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" class="rounded-circle mb-3" alt="User Avatar" width="80" height="80" style="object-fit: cover;">
+                            <h5>Michael R.</h5>
+                            <div class="text-warning mb-2">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                            <p class="text-muted">"Trip Planner made our vacation to Tokyo effortless! The AI recommendations were spot-on and saved us hours of research."</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" class="rounded-circle mb-3" alt="User Avatar" width="80" height="80" style="object-fit: cover;">
+                            <h5>Sarah K.</h5>
+                            <div class="text-warning mb-2">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-half"></i>
+                            </div>
+                            <p class="text-muted">"We used Trip Planner for our honeymoon in Bali and loved how it balanced adventure with relaxation. Perfect itinerary!"</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" class="rounded-circle mb-3" alt="User Avatar" width="80" height="80" style="object-fit: cover;">
+                            <h5>David T.</h5>
+                            <div class="text-warning mb-2">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                            <p class="text-muted">"As a budget traveler, I was amazed by how well Trip Planner optimized my Paris experience while keeping costs low."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center">
+        <div class="container">
+            <p class="mb-0">© 2025 Trip Planner - Plan your perfect trip with ML recommendations</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animations
+        function animateOnScroll() {
+            const elements = document.querySelectorAll('.feature-card, .destination-card, #testimonials-row .card');
+            const sections = document.querySelectorAll('section');
+            
+            elements.forEach(element => {
+                const rect = element.getBoundingClientRect();
+                const isVisible = rect.top < window.innerHeight - 100;
+                
+                if (isVisible) {
+                    element.classList.add('animate-fade-in');
+                }
+            });
+            
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                const isVisible = rect.top < window.innerHeight - 100;
+                
+                if (isVisible) {
+                    section.classList.add('section-visible');
+                }
+            });
+        }
+        
+        // Theme switcher
+        document.addEventListener('DOMContentLoaded', function() {
+            const htmlElement = document.documentElement;
+            const lightThemeIcon = document.getElementById('lightThemeIcon');
+            const darkThemeIcon = document.getElementById('darkThemeIcon');
+            
+            // Check for saved theme preference or use OS preference
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            // Set the initial theme
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                setDarkTheme();
+            } else {
+                setLightTheme();
+            }
+            
+            // Theme toggle event listeners
+            lightThemeIcon.addEventListener('click', setDarkTheme);
+            darkThemeIcon.addEventListener('click', setLightTheme);
+            
+            function setDarkTheme() {
+                htmlElement.setAttribute('data-bs-theme', 'dark');
+                lightThemeIcon.classList.add('d-none');
+                darkThemeIcon.classList.remove('d-none');
+                localStorage.setItem('theme', 'dark');
+                
+                // Update navbar classes
+                document.querySelector('.navbar').classList.remove('navbar-dark', 'bg-primary');
+                document.querySelector('.navbar').classList.add('navbar-dark', 'bg-dark');
+            }
+            
+            function setLightTheme() {
+                htmlElement.setAttribute('data-bs-theme', 'light');
+                darkThemeIcon.classList.add('d-none');
+                lightThemeIcon.classList.remove('d-none');
+                localStorage.setItem('theme', 'light');
+                
+                // Update navbar classes
+                document.querySelector('.navbar').classList.remove('navbar-dark', 'bg-dark');
+                document.querySelector('.navbar').classList.add('navbar-dark', 'bg-primary');
+            }
+            
+            // Initialize animations
+            window.addEventListener('scroll', animateOnScroll);
+            animateOnScroll();
+            
+            // Apply uniform animations to all cards
+            const allCards = document.querySelectorAll('.feature-card, .destination-card, #testimonials-row .card');
+            allCards.forEach((card, index) => {
+                // Add fade in animation with staggered delay
+                card.classList.add('animate-fade-in');
+                card.style.animationDelay = (0.1 * index) + 's';
+                
+                // Add subtle animation to each card based on index
+                if (index % 4 === 0) {
+                    card.classList.add('animate-bounce');
+                } else if (index % 4 === 1) {
+                    card.classList.add('animate-glow');
+                } else if (index % 4 === 2) {
+                    card.classList.add('animate-color-shift');
+                } else {
+                    card.classList.add('animate-float');
+                }
+                
+                // Apply uniform hover effects
+                const cardImg = card.querySelector('img');
+                if (cardImg) {
+                    cardImg.style.transition = 'transform 0.5s ease, filter 0.5s ease';
+                }
+                
+                // Add pulse effect to all buttons
+                const cardBtn = card.querySelector('.btn');
+                if (cardBtn) {
+                    cardBtn.classList.add('animate-pulse');
+                }
+            });
+            
+            // Fix any image loading issues
+            const cardImages = document.querySelectorAll('.card-img-top');
+            cardImages.forEach(img => {
+                img.addEventListener('error', function() {
+                    if (img.src.includes('unsplash')) {
+                        // If image fails to load, try an alternative
+                        const alt = img.getAttribute('alt').toLowerCase();
+                        if (alt === 'barcelona') {
+                            img.src = 'https://images.unsplash.com/photo-1583422409516-2895a77efded?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80';
+                        } else if (alt === 'maldives') {
+                            img.src = 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80';
+                        } else {
+                            // For other images
+                            const originalSrc = img.src;
+                            img.src = '';
+                            setTimeout(() => {
+                                img.src = originalSrc;
+                            }, 100);
+                        }
+                    }
+                });
+            });
+            
+            // Add parallax effect to hero section
+            window.addEventListener('scroll', function() {
+                const scrollPosition = window.pageYOffset;
+                const heroSection = document.querySelector('.hero-section');
+                if (heroSection) {
+                    heroSection.style.backgroundPositionY = scrollPosition * 0.5 + 'px';
+                }
+            });
+            
+            // Add scroll-triggered animations for section titles
+            const sectionTitles = document.querySelectorAll('.section-title');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.parentElement.classList.add('section-visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            sectionTitles.forEach(title => {
+                observer.observe(title);
+            });
+        });
+        
+        // API endpoints
+        const API_BASE_URL = 'http://localhost:5000';
+        const ML_SERVICE_URL = 'http://localhost:5001';
+
+        // Utility functions
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+            alertDiv.style.zIndex = "9999";
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.insertBefore(alertDiv, document.body.firstChild);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+
+        function scrollToDestinations() {
+            document.querySelector('.bg-light').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Authentication functions
+        async function login() {
+            const loginErrorDiv = document.getElementById('loginError');
+            loginErrorDiv.classList.add('d-none');
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                // In this demo, simulate successful login
+                console.log("Login attempt with:", { email });
+                
+                // Demo simulation - no actual API call in the demo
+                if (email && password) {
+                    localStorage.setItem('user', JSON.stringify({ email, name: email.split('@')[0] }));
+                    showAlert('Login successful!');
+                    
+                    const loginModal = document.getElementById('loginModal');
+                    const bsModal = bootstrap.Modal.getInstance(loginModal);
+                    bsModal.hide();
+                    
+                    updateUserInterface();
+                } else {
+                    loginErrorDiv.textContent = 'Please enter both email and password.';
+                    loginErrorDiv.classList.remove('d-none');
+                }
+            } catch (error) {
+                console.error("Login error:", error);
+                loginErrorDiv.textContent = 'Login failed. Please check your credentials.';
+                loginErrorDiv.classList.remove('d-none');
+            }
+        }
+
+        async function register() {
+            const registerErrorDiv = document.getElementById('registerError');
+            registerErrorDiv.classList.add('d-none');
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+
+            try {
+                // In this demo, simulate successful registration
+                console.log("Registration attempt with:", { name, email });
+                
+                // Demo simulation - no actual API call in the demo
+                if (name && email && password) {
+                    localStorage.setItem('user', JSON.stringify({ email, name }));
+                    showAlert('Registration successful!');
+                    
+                    const registerModal = document.getElementById('registerModal');
+                    const bsModal = bootstrap.Modal.getInstance(registerModal);
+                    bsModal.hide();
+                    
+                    updateUserInterface();
+                } else {
+                    registerErrorDiv.textContent = 'Please fill in all required fields.';
+                    registerErrorDiv.classList.remove('d-none');
+                }
+            } catch (error) {
+                console.error("Registration error:", error);
+                registerErrorDiv.textContent = 'Registration failed. Please try again.';
+                registerErrorDiv.classList.remove('d-none');
+            }
+        }
+        
+        function updateUserInterface() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            
+            if (user) {
+                // Show logged-in state in the navbar
+                const authButtons = document.querySelector('.navbar .d-flex.align-items-center');
+                authButtons.innerHTML = `
+                    <div class="theme-toggle me-3">
+                        <i class="bi bi-sun-fill theme-icon" id="lightThemeIcon"></i>
+                        <i class="bi bi-moon-fill theme-icon d-none" id="darkThemeIcon"></i>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i> ${user.name}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">My Trips</a></li>
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+                        </ul>
+                    </div>
+                `;
+                
+                // Reinitialize theme icons after DOM change
+                const lightThemeIcon = document.getElementById('lightThemeIcon');
+                const darkThemeIcon = document.getElementById('darkThemeIcon');
+                
+                const theme = localStorage.getItem('theme');
+                if (theme === 'dark') {
+                    lightThemeIcon.classList.add('d-none');
+                    darkThemeIcon.classList.remove('d-none');
+                } else {
+                    darkThemeIcon.classList.add('d-none');
+                    lightThemeIcon.classList.remove('d-none');
+                }
+                
+                lightThemeIcon.addEventListener('click', setDarkTheme);
+                darkThemeIcon.addEventListener('click', setLightTheme);
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('user');
+            showAlert('You have been logged out', 'info');
+            location.reload();
+        }
+
+        // Trip planning functions
+        async function generateTripPlan() {
+            try {
+                const form = document.getElementById('tripForm');
+                const loading = document.querySelector('.loading');
+                const results = document.getElementById('tripResults');
+
+                const tripData = {
+                    destination: document.getElementById('destination').value,
+                    startDate: document.getElementById('startDate').value,
+                    endDate: document.getElementById('endDate').value,
+                    budget: document.getElementById('budget').value,
+                    interests: Array.from(document.getElementById('interests').selectedOptions).map(option => option.value)
+                };
+
+                console.log("Trip data:", tripData);
+
+                // Validate form data
+                if (!tripData.destination || !tripData.startDate || !tripData.endDate || !tripData.budget) {
+                    showAlert('Please fill in all required fields.', 'warning');
+                    return;
+                }
+
+                loading.style.display = 'block';
+                results.classList.add('d-none');
+
+                // Generate dynamic recommendations based on user input
+                const recommendations = await generateRecommendations(tripData);
+                console.log("Recommendations generated:", recommendations);
+
+                // Display results
+                displayTripResults(recommendations);
+                loading.style.display = 'none';
+                results.classList.remove('d-none');
+                showAlert('Trip plan generated successfully!', 'success');
+            } catch (error) {
+                console.error('Error generating trip plan:', error);
+                document.querySelector('.loading').style.display = 'none';
+                showAlert('Failed to generate trip plan. Please try again.', 'danger');
+            }
+        }
+
+        // Generate recommendations based on user inputs
+        async function generateRecommendations(tripData) {
+            // Calculate trip duration in days
+            const startDate = new Date(tripData.startDate);
+            const endDate = new Date(tripData.endDate);
+            const tripDuration = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1);
+            
+            // Parse budget
+            const budget = parseInt(tripData.budget) || 500; // Default to 500 if parsing fails
+            
+            // Destination-specific attractions and activities
+            const destinationData = {
+                'Paris': {
+                    attractions: [
+                        { name: 'Eiffel Tower', description: 'Iconic iron tower offering stunning city views.', cost: 25, tags: ['culture', 'adventure'] },
+                        { name: 'Louvre Museum', description: 'World\'s largest art museum housing the Mona Lisa.', cost: 17, tags: ['culture'] },
+                        { name: 'Notre-Dame Cathedral', description: 'Medieval Catholic cathedral with Gothic architecture.', cost: 0, tags: ['culture'] },
+                        { name: 'Seine River Cruise', description: 'Scenic boat tour with views of Paris landmarks.', cost: 15, tags: ['relaxation'] },
+                        { name: 'Montmartre & Sacré-Cœur', description: 'Artistic neighborhood with stunning basilica.', cost: 0, tags: ['culture', 'relaxation'] },
+                        { name: 'Palace of Versailles', description: 'Opulent royal château outside of Paris.', cost: 27, tags: ['culture'] },
+                        { name: 'Champs-Élysées', description: 'Famous avenue known for luxury shopping.', cost: 0, tags: ['food', 'relaxation'] }
+                    ],
+                    foods: ['Croissants at a local bakery', 'Dinner at a bistro', 'Wine tasting session', 'French pastries', 'Michelin-star restaurant']
+                },
+                'Bali': {
+                    attractions: [
+                        { name: 'Ubud Monkey Forest', description: 'Nature reserve with over 700 monkeys.', cost: 10, tags: ['nature', 'adventure'] },
+                        { name: 'Tegallalang Rice Terraces', description: 'Stunning stepped rice paddies.', cost: 2, tags: ['nature', 'relaxation'] },
+                        { name: 'Tanah Lot Temple', description: 'Ancient Hindu shrine perched on a rock formation.', cost: 7, tags: ['culture'] },
+                        { name: 'Uluwatu Temple', description: 'Sea temple with dramatic cliff views.', cost: 5, tags: ['culture', 'nature'] },
+                        { name: 'Mount Batur Sunrise Trek', description: 'Volcanic hike with breathtaking sunrise views.', cost: 35, tags: ['adventure', 'nature'] },
+                        { name: 'Kuta Beach', description: 'Popular beach for surfing and relaxation.', cost: 0, tags: ['relaxation', 'adventure'] },
+                        { name: 'Bali Swing', description: 'Thrilling swings over jungle landscapes.', cost: 20, tags: ['adventure'] }
+                    ],
+                    foods: ['Nasi Goreng', 'Balinese Suckling Pig', 'Seafood dinner at Jimbaran Bay', 'Traditional Warung lunch', 'Fresh tropical fruits']
+                },
+                'Tokyo': {
+                    attractions: [
+                        { name: 'Tokyo Skytree', description: 'Tallest tower in Japan with observation decks.', cost: 25, tags: ['adventure'] },
+                        { name: 'Meiji Shrine', description: 'Shinto shrine dedicated to Emperor Meiji.', cost: 0, tags: ['culture'] },
+                        { name: 'Tsukiji Outer Market', description: 'Famous marketplace with fresh seafood.', cost: 0, tags: ['food'] },
+                        { name: 'Shinjuku Gyoen National Garden', description: 'Spacious park with diverse gardens.', cost: 5, tags: ['nature', 'relaxation'] },
+                        { name: 'Shibuya Crossing', description: 'Iconic busy intersection and shopping district.', cost: 0, tags: ['adventure', 'culture'] },
+                        { name: 'Senso-ji Temple', description: 'Ancient Buddhist temple in Asakusa.', cost: 0, tags: ['culture'] },
+                        { name: 'Tokyo Disneyland', description: 'Popular theme park with rides and attractions.', cost: 75, tags: ['adventure'] }
+                    ],
+                    foods: ['Sushi at local restaurant', 'Ramen in Shinjuku', 'Izakaya dining experience', 'Street food at Ueno Park', 'Traditional tea ceremony']
+                },
+                'Default': {
+                    attractions: [
+                        { name: 'Local Museum', description: 'Explore the local history and culture.', cost: 10, tags: ['culture'] },
+                        { name: 'City Park', description: 'Enjoy nature in the heart of the city.', cost: 0, tags: ['nature', 'relaxation'] },
+                        { name: 'Historic District', description: 'Walk through historic buildings and streets.', cost: 0, tags: ['culture'] },
+                        { name: 'Local Market', description: 'Shop for souvenirs and local products.', cost: 0, tags: ['food', 'culture'] },
+                        { name: 'Scenic Viewpoint', description: 'Get panoramic views of the destination.', cost: 5, tags: ['nature', 'adventure'] }
+                    ],
+                    foods: ['Local specialties', 'Street food experience', 'Dinner at popular restaurant', 'Café hopping', 'Food tour']
+                }
+            };
+
+            // Get destination data (or use default if not found)
+            let destinationInfo = destinationData.Default;
+            Object.keys(destinationData).forEach(key => {
+                if (tripData.destination.toLowerCase().includes(key.toLowerCase())) {
+                    destinationInfo = destinationData[key];
+                }
+            });
+
+            // Filter attractions based on user interests
+            let filteredAttractions = [...destinationInfo.attractions];
+            if (tripData.interests && tripData.interests.length > 0) {
+                filteredAttractions = filteredAttractions.filter(attraction => 
+                    attraction.tags.some(tag => tripData.interests.includes(tag))
+                );
+                // If no matches, fallback to all attractions
+                if (filteredAttractions.length === 0) {
+                    filteredAttractions = [...destinationInfo.attractions];
+                }
+            }
+            
+            // Sort attractions based on budget
+            const userBudget = parseInt(tripData.budget);
+            if (userBudget < 300) {
+                // For low budget, prioritize cheaper attractions
+                filteredAttractions.sort((a, b) => a.cost - b.cost);
+            } else if (userBudget > 1000) {
+                // For high budget, include some premium attractions
+                filteredAttractions.sort((a, b) => b.cost - a.cost);
+            }
+
+            // Generate itinerary days
+            const itinerary = [];
+            for (let day = 1; day <= tripDuration; day++) {
+                // For each day, select 2-4 activities
+                const dayAttractions = [];
+                const numActivities = Math.min(Math.floor(Math.random() * 3) + 2, filteredAttractions.length);
+                
+                // Get random attractions for this day
+                const dayIndices = new Set();
+                while (dayIndices.size < numActivities) {
+                    const randomIndex = Math.floor(Math.random() * filteredAttractions.length);
+                    dayIndices.add(randomIndex);
+                }
+                
+                // Add selected attractions
+                Array.from(dayIndices).forEach(index => {
+                    dayAttractions.push(filteredAttractions[index].name);
+                });
+                
+                // Add a food experience
+                const foodIndex = Math.floor(Math.random() * destinationInfo.foods.length);
+                dayAttractions.push(destinationInfo.foods[foodIndex]);
+                
+                // Add to itinerary
+                itinerary.push({
+                    day,
+                    activities: dayAttractions
+                });
+            }
+            
+            // Generate recommended places
+            const recommendedPlaces = filteredAttractions.slice(0, 6).map(attraction => ({
+                name: attraction.name,
+                description: attraction.description,
+                cost: attraction.cost
+            }));
+            
+            // Add a brief delay to simulate processing
+            await new Promise(resolve => setTimeout(resolve, 1800));
+            
+            return {
+                itinerary,
+                places: recommendedPlaces
+            };
+        }
+
+        function displayTripResults(recommendations) {
+            const itineraryDiv = document.getElementById('itinerary');
+            const recommendationsDiv = document.getElementById('recommendations');
+            
+            // Format the itinerary
+            itineraryDiv.innerHTML = `
+                <h6 class="mb-3">Your Itinerary</h6>
+                <div class="list-group mb-4">
+                    ${recommendations.itinerary.map(day => `
+                        <div class="list-group-item">
+                            <h6 class="mb-1">Day ${day.day}</h6>
+                            <ul class="mb-0 ps-3">
+                                ${day.activities.map(activity => `<li>${activity}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            // Format the recommendations
+            recommendationsDiv.innerHTML = `
+                <h6 class="mb-3">Recommended Places</h6>
+                <div class="row g-3">
+                    ${recommendations.places.map(place => `
+                        <div class="col-md-6">
+                            <div class="card h-100 animate-fade-in">
+                                <div class="card-body">
+                                    <h6 class="card-title">${place.name}</h6>
+                                    <p class="card-text">${place.description}</p>
+                                    <p class="card-text"><small class="text-muted">Estimated cost: $${place.cost}</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function scrollToDestinations() {
+            document.querySelector('.bg-light').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM fully loaded");
+            
+            // Initialize all modals and ensure close buttons work
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modalEl => {
+                const modalInstance = new bootstrap.Modal(modalEl);
+                
+                // Add explicit click handler to each close button
+                const closeBtn = modalEl.querySelector('.btn-close');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        modalInstance.hide();
+                    });
+                }
+                
+                // Also add click handler to "Close" buttons in footer
+                const closeFooterBtn = modalEl.querySelector('.modal-footer .btn-secondary');
+                if (closeFooterBtn) {
+                    closeFooterBtn.addEventListener('click', () => {
+                        modalInstance.hide();
+                    });
+                }
+            });
+            
+            // Add click handlers to destination cards
+            document.querySelectorAll('.destination-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (!e.target.classList.contains('btn')) {
+                        const destination = this.querySelector('.card-title').textContent;
+                        document.getElementById('destination').value = destination;
+                        
+                        const planTripModal = document.getElementById('planTripModal');
+                        const modal = new bootstrap.Modal(planTripModal);
+                        modal.show();
+                    }
+                });
+            });
+            
+            // Make the "Learn More" buttons open the planning modal too
+            document.querySelectorAll('.destination-card .btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault(); // Prevent default link behavior
+                    e.stopPropagation(); // Prevent card click from firing
+                    const destination = this.closest('.card').querySelector('.card-title').textContent;
+                    document.getElementById('destination').value = destination;
+                    
+                    const planTripModal = document.getElementById('planTripModal');
+                    const modal = new bootstrap.Modal(planTripModal);
+                    modal.show();
+                });
+            });
+
+            // Set default dates
+            const today = new Date();
+            const nextWeek = new Date(today);
+            nextWeek.setDate(today.getDate() + 7);
+
+            document.getElementById('startDate').value = today.toISOString().split('T')[0];
+            document.getElementById('endDate').value = nextWeek.toISOString().split('T')[0];
+            
+            // Set a default budget value
+            document.getElementById('budget').value = "1000";
+            
+            // Initialize multiple select for interests
+            const interestsElement = document.getElementById('interests');
+            if (interestsElement) {
+                // Add placeholder text
+                const placeholderOption = document.createElement('option');
+                placeholderOption.disabled = true;
+                placeholderOption.textContent = "Select your interests...";
+                interestsElement.prepend(placeholderOption);
+                
+                // Enable selecting multiple by clicking with Ctrl key
+                interestsElement.addEventListener('mousedown', function(e) {
+                    if (!e.ctrlKey && !e.metaKey) {
+                        e.preventDefault();
+                        this.focus();
+                        const option = this.options[this.selectedIndex];
+                        option.selected = !option.selected;
+                        this.dispatchEvent(new Event('change'));
+                    }
+                });
+            }
+            
+            // Add form submission handling via button and Enter key
+            document.getElementById('tripForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                generateTripPlan();
+            });
+            
+            // Add event handler for the Generate Plan button
+            document.querySelector('.modal-footer .btn-primary').addEventListener('click', function() {
+                generateTripPlan();
+            });
+            
+            // Initialize login and register form handling
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                login();
+            });
+            
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                register();
+            });
+            
+            // Check for logged in user
+            updateUserInterface();
+        });
+
+        // Add animation to section titles
+        document.querySelectorAll('.section-title').forEach((title, index) => {
+            title.classList.add('animate-fade-in');
+            title.style.animationDelay = 0.3 * index + 's';
+        });
+        
+        // Add animation to hero content elements
+        document.querySelectorAll('.hero-section .container > *').forEach((element, index) => {
+            element.classList.add('animate-fade-in');
+            element.style.animationDelay = 0.3 * index + 's';
+        });
+        
+        // Add text animation to call-to-action
+        const ctaSection = document.querySelector('section:nth-of-type(4)');
+        if (ctaSection) {
+            ctaSection.querySelectorAll('h2, p').forEach(element => {
+                element.classList.add('animate-bounce');
+            });
+        }
+        
+        // Add animation to testimonial cards
+        document.querySelectorAll('#testimonials-row .card').forEach((card, index) => {
+            card.classList.add('animate-fade-in');
+            card.style.animationDelay = 0.2 * index + 's';
+            
+            // Add hover effect
+            card.addEventListener('mouseenter', () => {
+                card.classList.add('animate-glow');
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.classList.remove('animate-glow');
+            });
+        });
+        
+        // Add floating animation to call-to-action buttons
+        document.querySelectorAll('.btn-lg').forEach(btn => {
+            btn.classList.add('animate-float');
+        });
+
+        // Add background switching functionality
+        document.querySelectorAll('.bg-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Update active class
+                document.querySelectorAll('.bg-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Change the background
+                const bgValue = this.getAttribute('data-bg');
+                document.documentElement.style.setProperty('--hero-bg-image', bgValue);
+                
+                // Save preference
+                localStorage.setItem('hero-bg', bgValue);
+            });
+        });
+        
+        // Load saved background preference if exists
+        const savedBg = localStorage.getItem('hero-bg');
+        if (savedBg) {
+            document.documentElement.style.setProperty('--hero-bg-image', savedBg);
+            // Update active class
+            document.querySelectorAll('.bg-option').forEach(opt => {
+                if (opt.getAttribute('data-bg') === savedBg) {
+                    document.querySelectorAll('.bg-option').forEach(o => o.classList.remove('active'));
+                    opt.classList.add('active');
+                }
+            });
+        }
+
+        // Initialize login and register form handling
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            login();
+        });
+        
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            register();
+        });
+
+        // Check if user is already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            // Previous code...
+            
+            // Check for logged in user
+            updateUserInterface();
+        });
+    </script>
+</body>
+</html> 
